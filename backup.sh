@@ -11,9 +11,7 @@ SSH_TARGET='cms'
 TIMESTAMP=`date +%Y-%m-%dT%H%M`
 FILE="cmsracing_$TIMESTAMP.tar.gz"
 BANDWIDTH=1024 # kbps. Max scp bandwidth
-
-# Destination
-DEST='cmsracin@ry.ca:backups'
+S3DEST="s3://cms-backup/"
 TMP='/data/tmp'
 
 # MySQL Username/pw in ~/.my.cnf on destination
@@ -42,12 +40,12 @@ mkdir cms
 status "Copying Remote Files"
 # XXX - scp doesn't have an exclude option, so we have to be explicit here.
 # I'd rather move this to config, but right now it's not worth the effort.
-scp -rpCl $BANDWIDTH $SSH_TARGET:{public_html*,ssl,bin,etc,.[a-z]*} cms
+scp -rpCl $BANDWIDTH $SSH_TARGET:{*.sql,public_html*,ssl,bin,etc,.[a-z]*} cms
 
 status "Compressing Local Mirror"
 tar cvzf $FILE cms
 
-status "Copying Backup Tarball to $DEST"
-scp $FILE $DEST
+status "Uploading Backup Tarball to $S3DEST"
+s3cmd -rr put $FILE $S3DEST
 
 status "Done! Backup is at $DEST:$FILE"
