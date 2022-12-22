@@ -11,8 +11,9 @@ SSH_TARGET='cms'
 TIMESTAMP=`date +%Y-%m-%dT%H%M`
 FILE="cmsracing_$TIMESTAMP.tar.gz"
 BANDWIDTH=1024 # kbps. Max scp bandwidth
-S3DEST="s3://cms-backup/"
+S3DEST="s3://cmsracing-backup/"
 TMP='/data/tmp'
+MYSQL_DB=cmsracin_wp323
 
 # MySQL Username/pw in ~/.my.cnf on destination
 
@@ -23,7 +24,7 @@ status() {
 }
 
 status "Generating MySQL Dump"
-ssh $SSH_TARGET mysqldump --add-drop-table $MYSQL_DB > $MYSQL_DB.sql
+ssh $SSH_TARGET mysqldump --add-drop-table $MYSQL_DB \> $MYSQL_DB.sql
 
 # Normally I'd use this:
 # ssh $SSH_TARGET tar cvzf $FILE -X backup_exclude.txt .
